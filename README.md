@@ -3,13 +3,13 @@
 
 ## Project Overview
 
-Alright, so this thing is basically a dashboard to simulate an AI-powered call center IVR. The main idea is to let you test how an AI would handle the initial part of a call – you know, grabbing the caller's name and age, and then figuring out if that info is good enough to pass them to a human.
+Alright, so this thing is basically a dashboard I whipped up to simulate an AI-powered call center IVR. The main idea was for me to test how an AI would handle the initial part of a call – you know, grabbing the caller's name and age, and then figuring out if that info is good enough to pass them to a human.
 
-We're using Next.js for the frontend, mostly because it's quick to get stuff up and running, and server components are pretty neat for this kind of dashboard. For the UI, it's all ShadCN components with Tailwind CSS, so it looks decent without a ton of custom styling work.
+I used Next.js for the frontend, mostly because it's quick to get stuff up and running, and server components are pretty neat for this kind of dashboard. For the UI, it's all ShadCN components with Tailwind CSS, so it looks decent without a ton of custom styling work on my part.
 
-The AI smarts? That's Genkit. We've got a couple of flows set up: one to pull out info like name and age from whatever text you type in (simulating a call transcript), and another to double-check if that info makes sense. Think of it like a quick sanity check before a real agent gets bothered.
+The AI smarts? That's Genkit. I've got a couple of flows set up: one to pull out info like name and age from whatever text you type in (simulating a call transcript), and another to double-check if that info makes sense. Think of it like a quick sanity check before a real agent gets bothered.
 
-You can punch in some sample call transcripts on the dashboard, hit a button, and see what the AI comes up with. It's all mock data for the agent statuses and call logs right now, but the AI simulation part is live. Helps to quickly see if the prompts we're giving the AI are actually working or if they need tweaking. Pretty handy for iterating on the AI logic without needing a full phone system hooked up.
+You can punch in some sample call transcripts on the dashboard, hit a button, and see what the AI comes up with. It's all mock data for the agent statuses and call logs right now, but the AI simulation part is live. It helped me quickly see if the prompts I'm giving the AI are actually working or if they need tweaking. Pretty handy for iterating on the AI logic without needing a full phone system hooked up.
 
 ## Tech Stack & Key Tools
 
@@ -101,4 +101,3 @@ You can punch in some sample call transcripts on the dashboard, hit a button, an
 *   `public/`: Static assets.
 *   `tailwind.config.ts`: Tailwind CSS configuration.
 *   `next.config.ts`: Next.js configuration.
-
