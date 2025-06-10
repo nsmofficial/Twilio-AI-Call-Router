@@ -1,3 +1,4 @@
+
 'use server';
 
 import { collectCallerInformation, CollectCallerInformationInput, CollectCallerInformationOutput } from '@/ai/flows/collect-caller-information';
@@ -8,6 +9,26 @@ export async function processCallTranscriptAction(
   callTranscript: string
 ): Promise<AISimulationResult> {
   const result: AISimulationResult = {};
+
+  if (!process.env.GOOGLE_API_KEY) {
+    const errorMessage = "AI Simulation Disabled: GOOGLE_API_KEY is missing. Please add it to your .env file to enable AI features.";
+    console.warn(errorMessage);
+    return {
+      error: errorMessage,
+      collectedInfo: {
+        error: "AI features are disabled. API key not found.",
+        name: "N/A",
+        age: 0,
+        readyForHuman: false,
+      },
+      verificationInfo: {
+        error: "AI features are disabled. API key not found.",
+        isValid: false,
+        confidenceScore: 0,
+        reason: "API key not configured."
+      }
+    };
+  }
 
   try {
     const collectionInput: CollectCallerInformationInput = { callTranscript };
@@ -37,8 +58,6 @@ export async function processCallTranscriptAction(
         };
       }
     } else if (collectedInfo.readyForHuman) {
-        // This case means readyForHuman was true, but name or age was missing.
-        // This shouldn't happen based on the prompt for collectCallerInformation, but good to handle.
         result.verificationInfo = {
             error: 'Cannot proceed to verification: Name or age missing despite IVR indicating readiness.',
             isValid: false,
@@ -55,3 +74,4 @@ export async function processCallTranscriptAction(
 
   return result;
 }
+
