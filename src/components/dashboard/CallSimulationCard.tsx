@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -18,7 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 
 
 const formSchema = z.object({
-  callTranscript: z.string().min(10, { message: "Transcript must be at least 10 characters." }),
+  callTranscript: z.string().min(3, { message: "Transcript must be at least 3 characters." }),
 });
 type FormData = z.infer<typeof formSchema>;
 
