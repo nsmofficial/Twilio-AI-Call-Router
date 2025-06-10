@@ -3,7 +3,7 @@
 
 ## Project Overview
 
-Alright, so this thing is basically a dashboard I whipped up to simulate an AI-powered call center IVR. The main idea was for me to test how an AI would handle the initial part of a call – you know, grabbing the caller's name and age, and then figuring out if that info is good enough to pass them to a human.
+This project is a dashboard I whipped up to simulate an AI-powered call center IVR. The main idea was for me to test how an AI would handle the initial part of a call – you know, grabbing the caller's name and age, and then figuring out if that info is good enough to pass them to a human.
 
 I used Next.js for the frontend, mostly because it's quick to get stuff up and running, and server components are pretty neat for this kind of dashboard. For the UI, it's all ShadCN components with Tailwind CSS, so it looks decent without a ton of custom styling work on my part.
 
@@ -35,7 +35,7 @@ The project also includes initial setup for Twilio integration to handle live ca
     *   A Twilio account.
     *   Your Twilio Account SID and Auth Token.
     *   A Twilio phone number.
-*   **ngrok (For Local Twilio Development):**
+*   **ngrok (For Local Twilio Development, if not using a cloud IDE with a public URL):**
     *   A tool to expose your local server to the internet, so Twilio can send requests to your webhook. Download from [ngrok.com](https://ngrok.com/).
 
 ## Setup & Running
@@ -80,11 +80,17 @@ The project also includes initial setup for Twilio integration to handle live ca
     npm run dev
     ```
     The application will typically be available at `http://localhost:9002` (or the port specified in your `package.json` `dev` script or Next.js default `3000`).
+    If you are using a cloud-based IDE (like Firebase Studio, Gitpod, GitHub Codespaces, etc.), it will provide you with a public URL for your running application.
 
 5.  **Set up Twilio Webhook (for Twilio integration):**
-    Twilio needs to send HTTP requests to your application's `/api/twilio/voice` endpoint. For this to work during development, this endpoint must be accessible from the public internet.
+    Twilio needs to send HTTP requests to your application's `/api/twilio/voice` endpoint. This endpoint must be accessible from the public internet.
 
-    *   **Using ngrok (Recommended for local development):**
+    *   **If using a Cloud-Based IDE (e.g., Firebase Studio, Gitpod, GitHub Codespaces):**
+        1.  Ensure your Next.js app is running.
+        2.  Your cloud IDE will provide a public URL for your running application (e.g., `https://your-unique-id.cloud-provider.dev` or `https://port-9002-your-instance.cloud-provider.app`).
+        3.  Your Twilio webhook URL will be this public URL plus `/api/twilio/voice` (e.g., `https://your-unique-id.cloud-provider.dev/api/twilio/voice`).
+
+    *   **If running locally (not in a cloud IDE with a public URL):**
         1.  Ensure your Next.js app is running (e.g., on port `9002`).
         2.  Open a new terminal and run `ngrok` to expose your local port:
             ```bash
@@ -100,7 +106,7 @@ The project also includes initial setup for Twilio integration to handle live ca
         3.  Click on the Twilio phone number you want to use.
         4.  Scroll down to the "Voice & Fax" (or "Voice") section.
         5.  Under "A CALL COMES IN" (or "CONFIGURE WITH", "PRIMARY HANDLER"), select "Webhook".
-        6.  In the text field, paste your full public webhook URL (from ngrok or your publicly accessible development environment, e.g., `https://your-public-url.com/api/twilio/voice`).
+        6.  In the text field, paste your full public webhook URL (from your cloud IDE or ngrok, e.g., `https://your-public-url.com/api/twilio/voice`).
         7.  Ensure the HTTP method is set to `HTTP POST`.
         8.  Save the configuration.
         9.  Call your Twilio number to test. You should hear the message from `src/app/api/twilio/voice/route.ts`.
@@ -144,6 +150,7 @@ The project also includes initial setup for Twilio integration to handle live ca
     *   `utils.ts`: Utility functions.
 *   `src/types/`: TypeScript type definitions.
 *   `public/`: Static assets.
-*   `.env.example`: Example environment file.
+*   `.env.example`: Example environment file for API keys and other secrets.
 *   `tailwind.config.ts`, `next.config.ts`, `package.json`, `tsconfig.json`: Project configuration files.
-```
+
+    
