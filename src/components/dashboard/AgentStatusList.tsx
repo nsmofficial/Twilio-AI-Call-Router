@@ -1,14 +1,15 @@
+
 import type { Agent, AgentStatus } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { UserCheck, UserX, PhoneCall, Clock as OfflineIcon, UserCircle } from 'lucide-react'; // Replaced User with UserCircle for fallback
+import { UserCheck, UserX, PhoneCall, Clock as OfflineIcon, UserCircle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const mockAgents: Agent[] = [
-  { id: '1', name: 'Alice Wonderland', avatarUrl: 'https://placehold.co/40x40.png', status: 'available', callsHandledToday: 12, lastSeen: 'Online' },
-  { id: '2', name: 'Bob The Builder', avatarUrl: 'https://placehold.co/40x40.png', status: 'on_call', callsHandledToday: 15, currentCallId: 'CALL-789', lastSeen: 'Online' },
-  { id: '3', name: 'Charlie Brown', status: 'busy', callsHandledToday: 10, lastSeen: 'Online' },
-  { id: '4', name: 'Diana Prince', avatarUrl: 'https://placehold.co/40x40.png', status: 'offline', callsHandledToday: 0, lastSeen: '2 hours ago' },
+  { id: '1', name: 'Priya Sharma', avatarUrl: 'https://placehold.co/40x40.png', status: 'available', callsHandledToday: 12, lastSeen: 'Online' },
+  { id: '2', name: 'Amit Singh', avatarUrl: 'https://placehold.co/40x40.png', status: 'on_call', callsHandledToday: 15, currentCallId: 'CALL-789', lastSeen: 'Online' },
+  { id: '3', name: 'Sunita Patel', status: 'busy', callsHandledToday: 10, lastSeen: 'Online' },
+  { id: '4', name: 'Rajesh Kumar', avatarUrl: 'https://placehold.co/40x40.png', status: 'offline', callsHandledToday: 0, lastSeen: '2 hours ago' },
 ];
 
 const statusIcons: Record<AgentStatus, React.ElementType> = {

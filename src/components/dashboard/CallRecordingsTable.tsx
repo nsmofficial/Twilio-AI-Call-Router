@@ -1,3 +1,4 @@
+
 import type { CallRecording } from '@/types';
 import {
   Table,
@@ -14,11 +15,11 @@ import { Badge } from '@/components/ui/badge';
 import { format, parseISO } from 'date-fns';
 
 const mockRecordings: CallRecording[] = [
-  { id: 'REC001', callerId: '+1-555-0101', startTime: new Date(Date.now() - 3600000).toISOString(), duration: '5m 32s', agent: { id: '1', name: 'Alice W.', status: 'available', callsHandledToday: 0 }, status: 'completed', transcriptSummary: 'Discussed account upgrade options.' },
-  { id: 'REC002', callerId: '+1-555-0102', startTime: new Date(Date.now() - 7200000).toISOString(), duration: '2m 10s', status: 'verification_successful', ivrPath: ['Greet', 'Name', 'Age', 'Verify'] },
-  { id: 'REC003', callerId: '+1-555-0103', startTime: new Date(Date.now() - 10800000).toISOString(), duration: '0m 45s', status: 'verification_failed', transcriptSummary: 'Age verification failed.' },
-  { id: 'REC004', callerId: '+1-555-0104', startTime: new Date(Date.now() - 14400000).toISOString(), duration: '3m 15s', agent: { id: '2', name: 'Bob B.', status: 'available', callsHandledToday: 0 }, status: 'completed' },
-  { id: 'REC005', callerId: '+1-555-0105', startTime: new Date(Date.now() - 18000000).toISOString(), duration: '1m 02s', status: 'missed' },
+  { id: 'REC001', callerId: '+91-9876500101', startTime: new Date(Date.now() - 3600000).toISOString(), duration: '5m 32s', agent: { id: '1', name: 'Priya S.', status: 'available', callsHandledToday: 0 }, status: 'completed', transcriptSummary: 'Inquired about new mobile plan details.' },
+  { id: 'REC002', callerId: '+91-9876500102', startTime: new Date(Date.now() - 7200000).toISOString(), duration: '2m 10s', status: 'verification_successful', ivrPath: ['Greet', 'Name', 'Age', 'Verify'] },
+  { id: 'REC003', callerId: '+91-9876500103', startTime: new Date(Date.now() - 10800000).toISOString(), duration: '0m 45s', status: 'verification_failed', transcriptSummary: 'Age verification for service failed.' },
+  { id: 'REC004', callerId: '+91-9876500104', startTime: new Date(Date.now() - 14400000).toISOString(), duration: '3m 15s', agent: { id: '2', name: 'Amit S.', status: 'available', callsHandledToday: 0 }, status: 'completed', transcriptSummary: 'Resolved billing query successfully.' },
+  { id: 'REC005', callerId: '+91-9876500105', startTime: new Date(Date.now() - 18000000).toISOString(), duration: '1m 02s', status: 'missed' },
 ];
 
 const statusIconsAndText: Record<CallRecording['status'], { icon: React.ElementType, text: string, colorClass: string }> = {
