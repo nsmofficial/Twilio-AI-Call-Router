@@ -36,7 +36,7 @@ const statusText: Record<AgentStatus, string> = {
 
 export function AgentStatusList() {
   return (
-    <Card className="shadow-lg transition-all hover:shadow-xl">
+    <Card className="transition-all hover:shadow-xl">
       <CardHeader>
         <CardTitle className="font-headline text-xl">Agent Status</CardTitle>
       </CardHeader>
@@ -46,7 +46,7 @@ export function AgentStatusList() {
           return (
             <div key={agent.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-secondary/50 transition-colors">
               <div className="flex items-center gap-3">
-                <Avatar className="h-10 w-10">
+                <Avatar className="h-10 w-10 border"> {/* Added border to Avatar */}
                   <AvatarImage src={agent.avatarUrl} alt={agent.name} data-ai-hint="profile person" />
                   <AvatarFallback>
                     <UserCircle className="h-6 w-6 text-muted-foreground" />
@@ -60,7 +60,7 @@ export function AgentStatusList() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                 <Badge variant={agent.status === 'available' ? 'default' : agent.status === 'on_call' ? 'secondary' : 'outline'} 
+                 <Badge variant={agent.status === 'available' ? 'default' : agent.status === 'on_call' ? 'secondary' : 'outline'}
                        className={
                            agent.status === 'available' ? 'bg-green-100 text-green-800 border-green-300' :
                            agent.status === 'on_call' ? 'bg-blue-100 text-blue-800 border-blue-300' :

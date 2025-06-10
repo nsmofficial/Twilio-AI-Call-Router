@@ -1,6 +1,7 @@
 import type { CallMetric } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { TrendingUp, TrendingDown, Phone, Users, Clock, ArrowRightCircle } from 'lucide-react';
+import { cn } from "@/lib/utils"
 
 const mockMetrics: CallMetric[] = [
   {
@@ -39,12 +40,12 @@ export function CallMetricsCards() {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {mockMetrics.map((metric) => (
-        <Card key={metric.label} className="shadow-lg transition-all hover:shadow-xl">
+        <Card key={metric.label} className="transition-all hover:shadow-xl">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">
               {metric.label}
             </CardTitle>
-            <metric.icon className="h-5 w-5 text-muted-foreground" />
+            <metric.icon className="h-6 w-6 text-muted-foreground" /> {/* Increased icon size */}
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-foreground font-headline">{metric.value}</div>
@@ -55,7 +56,7 @@ export function CallMetricsCards() {
                 ) : (
                   <TrendingDown className="mr-1 h-4 w-4 text-red-500" />
                 )}
-                <span className={metric.trendType === 'positive' ? 'text-green-600' : 'text-red-600'}>
+                <span className={cn(metric.trendType === 'positive' ? 'text-green-600' : 'text-red-600', 'font-semibold')}> {/* Made trend text bolder */}
                   {metric.trend}
                 </span>
                 <span className="ml-1">{metric.description}</span>

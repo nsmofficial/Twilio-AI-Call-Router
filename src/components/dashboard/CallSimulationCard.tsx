@@ -67,7 +67,7 @@ export function CallSimulationCard() {
   };
 
   return (
-    <Card className="shadow-lg transition-all hover:shadow-xl">
+    <Card className="transition-all hover:shadow-xl">
       <CardHeader>
         <CardTitle className="font-headline text-xl">AI Call Simulation</CardTitle>
         <CardDescription>Test the AI IVR and response verification flow.</CardDescription>
@@ -102,17 +102,17 @@ export function CallSimulationCard() {
             <h3 className="text-lg font-semibold font-headline">Simulation Results:</h3>
             {simulationResult.collectedInfo && (
               <Alert variant={simulationResult.collectedInfo.error ? "destructive" : "default"}>
-                 <Info className="h-4 w-4" />
+                 <Info className="h-5 w-5" /> {/* Increased icon size */}
                 <AlertTitle className="font-headline">Information Collection (IVR)</AlertTitle>
                 <AlertDescription className="space-y-1">
                   {simulationResult.collectedInfo.error ? (
                     <p>Error: {simulationResult.collectedInfo.error}</p>
                   ) : (
                     <>
-                      <p className="flex items-center"><User className="mr-2 h-4 w-4 text-muted-foreground" /> Name: {simulationResult.collectedInfo.name || 'Not Provided'}</p>
-                      <p className="flex items-center"><Calendar className="mr-2 h-4 w-4 text-muted-foreground" /> Age: {simulationResult.collectedInfo.age || 'Not Provided'}</p>
+                      <p className="flex items-center"><User className="mr-2 h-5 w-5 text-muted-foreground" /> Name: {simulationResult.collectedInfo.name || 'Not Provided'}</p> {/* Increased icon size */}
+                      <p className="flex items-center"><Calendar className="mr-2 h-5 w-5 text-muted-foreground" /> Age: {simulationResult.collectedInfo.age || 'Not Provided'}</p> {/* Increased icon size */}
                       <p className="flex items-center">
-                        {simulationResult.collectedInfo.readyForHuman ? <CheckCircle className="mr-2 h-4 w-4 text-green-500" /> : <XCircle className="mr-2 h-4 w-4 text-red-500" />}
+                        {simulationResult.collectedInfo.readyForHuman ? <CheckCircle className="mr-2 h-5 w-5 text-green-500" /> : <XCircle className="mr-2 h-5 w-5 text-red-500" />} {/* Increased icon size */}
                         Ready for Human Agent: {simulationResult.collectedInfo.readyForHuman ? 'Yes' : 'No'}
                       </p>
                     </>
@@ -123,7 +123,7 @@ export function CallSimulationCard() {
 
             {simulationResult.verificationInfo && (
               <Alert variant={simulationResult.verificationInfo.error ? "destructive" : (simulationResult.verificationInfo.isValid ? "default" : "destructive")}>
-                {simulationResult.verificationInfo.isValid ? <CheckCircle className="h-4 w-4" /> : <XCircle className="h-4 w-4" />}
+                {simulationResult.verificationInfo.isValid ? <CheckCircle className="h-5 w-5" /> : <XCircle className="h-5 w-5" />} {/* Increased icon size */}
                 <AlertTitle className="font-headline">Response Verification</AlertTitle>
                 <AlertDescription className="space-y-1">
                   {simulationResult.verificationInfo.error ? (
@@ -140,7 +140,7 @@ export function CallSimulationCard() {
             )}
             {simulationResult.error && !simulationResult.collectedInfo && !simulationResult.verificationInfo && (
                  <Alert variant="destructive">
-                    <XCircle className="h-4 w-4" />
+                    <XCircle className="h-5 w-5" /> {/* Increased icon size */}
                     <AlertTitle>Overall Simulation Error</AlertTitle>
                     <AlertDescription>{simulationResult.error}</AlertDescription>
                  </Alert>
