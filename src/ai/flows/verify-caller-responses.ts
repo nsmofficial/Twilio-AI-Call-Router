@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -14,7 +15,7 @@ import {z} from 'genkit';
 
 const VerifyCallerResponsesInputSchema = z.object({
   name: z.string().describe('The name of the caller.'),
-  age: z.string().describe('The age of the caller.'),
+  age: z.string().describe('The age of the caller (as a string). An age of "0" indicates it was not extracted properly in a previous step.'),
 });
 export type VerifyCallerResponsesInput = z.infer<typeof VerifyCallerResponsesInputSchema>;
 
@@ -33,20 +34,23 @@ const prompt = ai.definePrompt({
   name: 'verifyCallerResponsesPrompt',
   input: {schema: VerifyCallerResponsesInputSchema},
   output: {schema: VerifyCallerResponsesOutputSchema},
-  prompt: `You are an AI agent verifying caller responses to determine if they are valid and qualify for human agent handover.
+  prompt: `You are an AI agent responsible for verifying caller-provided information.
+Your goal is to determine if the extracted name and age are plausible and qualify the caller for handover to a human agent.
 
-  Evaluate the following information provided by the caller:
-  - Name: {{{name}}}
-  - Age: {{{age}}}
+Evaluate the following information:
+- Name: {{{name}}}
+- Age: {{{age}}} (This is provided as a string. An age of "0" indicates the age was not successfully extracted in a prior step.)
 
-  Based on the provided information, determine if the responses are valid and if the caller should be transferred to a human agent.
+Criteria for validity:
+- The name should appear to be a genuine name (not gibberish or empty).
+- The age should represent a plausible human age (e.g., greater than 0 and less than 120). An age of "0" is considered invalid as it means the age was not properly provided or extracted.
 
-  {{#if name}}
-  {{/if}}
+Based on these criteria:
+- Set 'isValid' to true if both name and age are plausible according to the criteria. Otherwise, set it to false.
+- Provide a 'confidenceScore' (0 to 1) for your assessment.
+- Include a 'reason' explaining your decision, especially if 'isValid' is false.
 
-  Return a confidence score between 0 and 1, where 1 indicates high confidence in the verification result.
-  Provide a reason for the verification result.
-  Output should be in JSON format.
+Output your response as a JSON object in the specified schema.
   `,
 });
 

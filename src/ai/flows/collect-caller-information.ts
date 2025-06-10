@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -21,12 +22,12 @@ export type CollectCallerInformationInput = z.infer<
 >;
 
 const CollectCallerInformationOutputSchema = z.object({
-  name: z.string().describe('The caller’s name.'),
-  age: z.number().describe('The caller’s age.'),
+  name: z.string().describe('The caller’s name. Empty string if not found.'),
+  age: z.number().describe('The caller’s age. 0 if not found or invalid.'),
   readyForHuman: z
     .boolean()
     .describe(
-      'True if the caller has provided all necessary information and is ready to be transferred to a human agent.'
+      'True if the caller has provided all necessary information (valid name and non-zero age) and is ready to be transferred to a human agent.'
     ),
 });
 export type CollectCallerInformationOutput = z.infer<
@@ -44,14 +45,29 @@ const collectCallerInformationPrompt = ai.definePrompt({
   input: {schema: CollectCallerInformationInputSchema},
   output: {schema: CollectCallerInformationOutputSchema},
   prompt: `You are an AI-powered Interactive Voice Response (IVR) system.
-Your job is to collect the caller's name and age. Once you have collected this information, set readyForHuman to true.
+Your primary task is to accurately extract the caller's name and age from the provided call transcript.
+The transcript can be in various formats:
+- Full sentences: "Hello, my name is John Doe and I am 30 years old."
+- Short phrases: "I'm Jane, 25."
+- Comma-separated: "Peter,45" or "Sarah , 22."
+- Name and age: "David 50"
+- Just name and age with minimal other text.
+
+Key instructions:
+1. Identify the caller's name. If no name is found, use an empty string for the 'name' field.
+2. Identify the caller's age. It MUST be an integer. If no valid age is found, use 0 for the 'age' field.
+3. Set 'readyForHuman' to true ONLY IF a plausible name (not an empty string) AND a valid, non-zero age have been successfully extracted. Otherwise, set 'readyForHuman' to false.
+4. Try to ignore non-alphanumeric characters like periods or commas if they seem like typos or separators, unless they are part of a typical name.
 
 Here is the current transcript of the call:
-{{callTranscript}}
+{{{callTranscript}}}
 
-Extract the name and age from the transcript. If the name or age is not present, leave the field blank. Only set readyForHuman to true if both the name and age are present.
-
-Output a JSON object containing the name, age, and readyForHuman fields. Ensure the age is an integer.
+Output a JSON object strictly in the following format, ensuring 'age' is always an integer:
+{
+  "name": "string",
+  "age": "integer",
+  "readyForHuman": "boolean"
+}
 `,
 });
 
