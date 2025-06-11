@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node dev-with-tunnel.js",
+    "dev": "tsx dev-with-tunnel.js",
     "db:migrate": "dotenv -e .env.local -- npx prisma migrate dev",
     "db:seed": "dotenv -e .env.local -- npx prisma db seed",
     "genkit:dev": "genkit start -- tsx src/ai/dev.ts",

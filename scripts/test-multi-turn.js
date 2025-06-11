@@ -84,6 +84,7 @@ async function runTest() {
 
     // --- Step 2: First Response (Name Only) ---
     log('--- Step 2: Simulating FIRST speech result (name only) ---');
+    log(`💬 Sending utterance: "${FIRST_UTTERANCE}"`);
     const gatherParams1 = new URLSearchParams({ CallSid: callSid, SpeechResult: FIRST_UTTERANCE, Confidence: '0.98' });
     const gatherResponse1 = await fetch(`${BASE_URL}/api/twilio/gather`, { method: 'POST', body: gatherParams1 });
     const gatherTwiML1 = await gatherResponse1.text();
@@ -103,6 +104,7 @@ async function runTest() {
 
     // --- Step 3: Second Response (Age) ---
     log('--- Step 3: Simulating SECOND speech result (age) ---');
+    log(`💬 Sending utterance: "${SECOND_UTTERANCE}"`);
     const gatherParams2 = new URLSearchParams({ 
         CallSid: callSid, 
         SpeechResult: SECOND_UTTERANCE, 
@@ -114,6 +116,26 @@ async function runTest() {
     log(`✅ Received TwiML:\n${gatherTwiML2}`);
     if (!gatherTwiML2.includes('<Dial')) throw new Error('Step 3 Failed: TwiML did not include <Dial> verb.');
     log('✅ TwiML contains <Dial> verb as expected.');
+
+    // --- Step 4: Simulate Call Cleanup ---
+    log('--- Step 4: Simulating call cleanup ---');
+    const dialActionMatch = gatherTwiML2.match(/<Dial.*?action="[^"]+\?agentId=([^"]+)"/);
+    if (!dialActionMatch || !dialActionMatch[1]) {
+      throw new Error("Step 4 Failed: Could not extract agentId from <Dial> action.");
+    }
+    const agentId = dialActionMatch[1];
+    log(`📞 Simulating end of call for agent: ${agentId}`);
+
+    const cleanupParams = new URLSearchParams({ 
+      CallSid: callSid, 
+      DialCallStatus: 'completed' 
+    });
+    const cleanupResponse = await fetch(`${BASE_URL}/api/twilio/dial-status?agentId=${agentId}`, { method: 'POST', body: cleanupParams });
+    if (!cleanupResponse.ok) {
+      throw new Error(`Step 4 Failed: Dial status webhook returned status ${cleanupResponse.status}`);
+    }
+    log(`✅ Agent status reset successfully.`);
+
 
     log('🎉 Multi-turn simulation finished successfully!');
 

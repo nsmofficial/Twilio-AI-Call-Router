@@ -2,6 +2,7 @@ require('dotenv').config({ path: '.env.local' });
 const ngrok = require('ngrok');
 const { spawn } = require('child_process');
 const { URL } = require('url');
+const { logger } = require('./src/lib/logger'); // Import the logger
 
 const port = 9003; // Your dev server port
 
@@ -19,20 +20,27 @@ const port = 9003; // Your dev server port
       authtoken_from_env: true,
       onStatusChange: (status) => {
         if (status === 'closed') {
-          console.log('Ngrok tunnel closed.');
+          logger.warn('Ngrok tunnel closed.');
           process.exit();
         }
       },
     });
   } catch (error) {
-    console.error('Error starting ngrok tunnel:', error);
+    logger.error('Error starting ngrok tunnel:', error);
     process.exit(1);
   }
 
+  // --- This is the new, centralized logging ---
+  logger.info('🚀 Server starting up...');
+  logger.info(`Ngrok tunnel established at: ${url}`);
+  logger.info(`Forwarding to: http://localhost:${port}`);
+  
+  // Also log to console for immediate visibility
   console.log('--------------------------------------------------');
   console.log('Ngrok tunnel established successfully!');
   console.log(`Forwarding to: http://localhost:${port}`);
   console.log(`Public URL: ${url}`);
+  console.log('See logs/app.log for detailed server logging.');
   console.log('--------------------------------------------------');
 
   const ngrokHost = new URL(url).hostname;
@@ -49,7 +57,7 @@ const port = 9003; // Your dev server port
   });
 
   const shutdown = () => {
-    console.log('Shutting down...');
+    logger.info('Shutting down server.');
     nextProcess.kill('SIGINT');
     ngrok.disconnect();
     process.exit();
@@ -59,7 +67,7 @@ const port = 9003; // Your dev server port
   process.on('SIGTERM', shutdown);
 
   nextProcess.on('close', (code) => {
-    console.log(`Next.js process exited with code ${code}`);
+    logger.info(`Next.js process exited with code ${code}`);
     ngrok.disconnect();
     process.exit(code);
   });

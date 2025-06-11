@@ -5,6 +5,13 @@ import { callService } from '@/services/call';
 
 export async function POST(request: Request) {
   const body = await request.formData();
+
+  // Convert formData to a plain object for logging
+  const bodyObject = Object.fromEntries(body.entries());
+  logger.info('Incoming call received from Twilio', {
+    twilioData: bodyObject,
+  });
+
   const callSid = body.get('CallSid') as string;
   const fromNumber = body.get('From') as string;
   const toNumber = body.get('To') as string;

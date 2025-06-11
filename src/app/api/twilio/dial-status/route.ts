@@ -21,13 +21,15 @@ export async function POST(request: Request) {
   logger.info(`Dial status for agent ${agentId}: ${callStatus}`);
   
   // Set the agent's status back to available regardless of the call outcome (e.g., completed, no-answer, busy).
-  // More complex logic could be added here to handle different statuses differently.
   await agentService.setAgentStatus(agentId, 'available');
   
-  await callService.updateCall(callSid, {
-    status: callStatus,
-    recordingUrl,
-  });
+  // Only update the call if we have a callSid and a status
+  if (callSid && callStatus) {
+    await callService.updateCall(callSid, {
+      status: callStatus,
+      recordingUrl,
+    });
+  }
 
   const twiml = await getTwiML(response => {
     // The call is over, so we just return an empty response.
