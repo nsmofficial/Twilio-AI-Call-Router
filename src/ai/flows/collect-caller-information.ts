@@ -1,4 +1,3 @@
-
 'use server';
 
 /**
@@ -22,13 +21,14 @@ export type CollectCallerInformationInput = z.infer<
 >;
 
 const CollectCallerInformationOutputSchema = z.object({
-  name: z.string().describe('The caller’s name. Empty string if not found.'),
-  age: z.number().describe('The caller’s age. 0 if not found or invalid.'),
+  name: z.string().describe('The caller\'s name. Empty string if not found.'),
+  age: z.number().describe('The caller\'s age. 0 if not found or invalid.'),
   readyForHuman: z
     .boolean()
     .describe(
       'True if the caller has provided all necessary information (valid name and non-zero age) and is ready to be transferred to a human agent.'
     ),
+  response: z.string().describe('The verbal response to say back to the caller. This should guide the user to the next step.'),
 });
 export type CollectCallerInformationOutput = z.infer<
   typeof CollectCallerInformationOutputSchema
@@ -44,29 +44,42 @@ const collectCallerInformationPrompt = ai.definePrompt({
   name: 'collectCallerInformationPrompt',
   input: {schema: CollectCallerInformationInputSchema},
   output: {schema: CollectCallerInformationOutputSchema},
-  prompt: `You are an AI-powered Interactive Voice Response (IVR) system.
-Your primary task is to accurately extract the caller's name and age from the provided call transcript.
-The transcript can be in various formats:
-- Full sentences: "Hello, my name is John Doe and I am 30 years old."
-- Short phrases: "I'm Jane, 25."
-- Comma-separated: "Peter,45" or "Sarah , 22."
-- Name and age: "David 50"
-- Just name and age with minimal other text.
+  prompt: `You are an AI-powered Interactive Voice Response (IVR) system for a top-tier financial services company. Your tone should be professional, clear, and helpful.
+Your primary task is to accurately extract the caller's full name and age from the provided call transcript.
 
-Key instructions:
-1. Identify the caller's name. If no name is found, use an empty string for the 'name' field.
-2. Identify the caller's age. It MUST be an integer. If no valid age is found, use 0 for the 'age' field.
-3. Set 'readyForHuman' to true ONLY IF a plausible name (not an empty string) AND a valid, non-zero age have been successfully extracted. Otherwise, set 'readyForHuman' to false.
-4. Try to ignore non-alphanumeric characters like periods or commas if they seem like typos or separators, unless they are part of a typical name.
+**Call Transcript Analysis:**
+- The transcript may contain full sentences, short phrases, or just the raw information.
+- Examples: "Hello, my name is John Doe and I am 30 years old.", "I'm Jane, 25.", "David 50".
+- Identify the caller's name. If no name is found, use an empty string.
+- Identify the caller's age as an integer. If no valid age is found, use 0.
 
-Here is the current transcript of the call:
+**Conversational Logic:**
+Your response MUST guide the conversation forward.
+
+1.  **If BOTH name and age are found:**
+    - Set 'readyForHuman' to true.
+    - Set 'response' to: "Thank you. I have your name as [Name] and your age as [Age]. Please hold while we connect you to an agent."
+2.  **If ONLY the name is found:**
+    - Set 'readyForHuman' to false.
+    - Set 'response' to: "Thank you, [Name]. And what is your age?"
+3.  **If ONLY the age is found:**
+    - Set 'readyForHuman' to false.
+    - Set 'response' to: "I have your age as [Age]. Could you please provide your full name?"
+4.  **If NEITHER name nor age is found:**
+    - Set 'readyForHuman' to false.
+    - Set 'response' to: "I'm sorry, I couldn't quite get that. Let's try one more time. Please state your full name and age."
+
+**Current Transcript of the Call:**
 {{{callTranscript}}}
 
-Output a JSON object strictly in the following format, ensuring 'age' is always an integer:
+**Output Instructions:**
+Output a JSON object strictly in the following format. Ensure 'age' is an integer.
+
 {
   "name": "string",
   "age": "integer",
-  "readyForHuman": "boolean"
+  "readyForHuman": "boolean",
+  "response": "string"
 }
 `,
 });

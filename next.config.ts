@@ -1,5 +1,8 @@
 import type {NextConfig} from 'next';
 
+const ngrokHost = process.env.NGROK_HOST;
+const allowedDevOrigins = ngrokHost ? [`https://${ngrokHost}`] : [];
+
 const nextConfig: NextConfig = {
   /* config options here */
   typescript: {
@@ -18,6 +21,7 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  allowedDevOrigins,
 };
 
 export default nextConfig;

@@ -1,6 +1,6 @@
 import { DashboardHeader } from '@/components/dashboard/Header';
 import { CallMetricsCards } from '@/components/dashboard/CallMetricsCard';
-import { AgentStatusList } from '@/components/dashboard/AgentStatusList';
+import { AgentStatusCard } from '@/components/dashboard/AgentStatusCard';
 import { CallRecordingsTable } from '@/components/dashboard/CallRecordingsTable';
 import { CallSimulationCard } from '@/components/dashboard/CallSimulationCard';
 
@@ -22,7 +22,7 @@ export default function DashboardPage() {
                 AI Simulation and Agent Status
              </h2>
             <CallSimulationCard />
-            <AgentStatusList />
+            <AgentStatusCard />
           </section>
 
           <section aria-labelledby="call-recordings-title" className="lg:col-span-2">

@@ -51,6 +51,7 @@ export interface AISimulationResult {
     name?: string;
     age?: number;
     readyForHuman?: boolean;
+    response?: string; // The AI-generated response to say to the user.
     error?: string;
   };
   verificationInfo?: {

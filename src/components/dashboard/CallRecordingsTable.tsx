@@ -1,109 +1,111 @@
+'use client';
 
-import type { CallRecording } from '@/types';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { PlayCircle, FileText, CheckCircle2, AlertTriangle, XCircle, PhoneForwarded, Clock, PhoneMissed, PhoneCall, Phone } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { format, parseISO } from 'date-fns';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { PlayCircle, Phone, User, Calendar, Tag } from 'lucide-react';
+import { format } from 'date-fns';
+import type { Call } from '@/services/call';
+import type { Agent } from '@/services/agent';
 
-const mockRecordings: CallRecording[] = [
-  { id: 'REC001', callerId: '+91-9876543210', startTime: new Date(Date.now() - 3600000).toISOString(), duration: '5m 32s', agent: { id: '1', name: 'Priya S.', status: 'available', callsHandledToday: 0 }, status: 'completed', transcriptSummary: 'Inquired about new mobile plan details.', recordingUrl: '#' },
-  { id: 'REC002', callerId: '+91-9988776655', startTime: new Date(Date.now() - 7200000).toISOString(), duration: '2m 10s', status: 'verification_successful', ivrPath: ['Greet', 'Name', 'Age', 'Verify'], transcriptSummary: 'Caller verified successfully.' },
-  { id: 'REC003', callerId: '+91-9123456789', startTime: new Date(Date.now() - 10800000).toISOString(), duration: '0m 45s', status: 'verification_failed', transcriptSummary: 'Age verification for service failed.' },
-  { id: 'REC004', callerId: '+91-9000011111', startTime: new Date(Date.now() - 14400000).toISOString(), duration: '3m 15s', agent: { id: '2', name: 'Amit K.', status: 'available', callsHandledToday: 0 }, status: 'completed', transcriptSummary: 'Resolved billing query successfully.', recordingUrl: '#' },
-  { id: 'REC005', callerId: '+91-9888877777', startTime: new Date(Date.now() - 18000000).toISOString(), duration: '1m 02s', status: 'missed' },
-];
-
-const statusIconsAndText: Record<CallRecording['status'], { icon: React.ElementType, text: string, colorClass: string }> = {
-  ringing: { icon: Phone, text: 'Ringing', colorClass: 'text-blue-500 bg-blue-100 border-blue-300' },
-  in_progress_ivr: { icon: Clock, text: 'IVR Active', colorClass: 'text-purple-500 bg-purple-100 border-purple-300' },
-  pending_verification: { icon: Clock, text: 'Verifying', colorClass: 'text-yellow-500 bg-yellow-100 border-yellow-300' },
-  verification_successful: { icon: CheckCircle2, text: 'Verified', colorClass: 'text-green-500 bg-green-100 border-green-300' },
-  verification_failed: { icon: XCircle, text: 'Verification Failed', colorClass: 'text-red-500 bg-red-100 border-red-300' },
-  routing_to_agent: { icon: PhoneForwarded, text: 'Routing', colorClass: 'text-cyan-500 bg-cyan-100 border-cyan-300' },
-  connected_to_agent: { icon: PhoneCall, text: 'Agent Connected', colorClass: 'text-indigo-500 bg-indigo-100 border-indigo-300' },
-  completed: { icon: CheckCircle2, text: 'Completed', colorClass: 'text-green-600 bg-green-100 border-green-400' },
-  missed: { icon: PhoneMissed, text: 'Missed', colorClass: 'text-orange-500 bg-orange-100 border-orange-300' },
-  failed: { icon: AlertTriangle, text: 'Failed', colorClass: 'text-red-600 bg-red-100 border-red-400' },
-};
-
+// A type that includes the agent details
+type CallWithAgent = Call & { agent: Agent | null };
 
 export function CallRecordingsTable() {
+  const [calls, setCalls] = useState<CallWithAgent[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCalls = async () => {
+      try {
+        const response = await fetch('/api/calls');
+        if (!response.ok) {
+          throw new Error('Failed to fetch call history');
+        }
+        const data: CallWithAgent[] = await response.json();
+        setCalls(data);
+      } catch (err: any) {
+        setError(err.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCalls();
+    // Refresh call history every 10 seconds
+    const interval = setInterval(fetchCalls, 10000);
+    return () => clearInterval(interval);
+  }, []);
+  
   return (
-    <Card className="transition-all hover:shadow-xl">
+    <Card>
       <CardHeader>
-        <CardTitle className="font-headline text-xl">Call Log & Recordings</CardTitle>
+        <CardTitle>Call History</CardTitle>
+        <CardDescription>A log of all processed calls.</CardDescription>
       </CardHeader>
       <CardContent>
-        <TooltipProvider>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Caller ID</TableHead>
-                <TableHead>Date & Time</TableHead>
-                <TableHead>Duration</TableHead>
-                <TableHead>Agent</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+         {isLoading ? (
+          <p>Loading call history...</p>
+        ) : error ? (
+          <p className="text-destructive">Error: {error}</p>
+        ) : (
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Caller</TableHead>
+              <TableHead>Agent</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead className="text-right">Recording</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {calls.map((call) => (
+              <TableRow key={call.id}>
+                <TableCell>
+                  <div className="flex items-center">
+                    <Phone className="mr-2 h-4 w-4 text-muted-foreground" />
+                    {call.fromNumber}
+                  </div>
+                </TableCell>
+                <TableCell>
+                   <div className="flex items-center">
+                    {call.agent ? (
+                      <>
+                        <User className="mr-2 h-4 w-4 text-muted-foreground" />
+                        {call.agent.name}
+                      </>
+                    ) : (
+                      <span className="text-muted-foreground">N/A</span>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline">{call.status}</Badge>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center">
+                     <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+                     {format(new Date(call.createdAt), 'PPpp')}
+                  </div>
+                </TableCell>
+                <TableCell className="text-right">
+                  {call.recordingUrl ? (
+                    <a href={call.recordingUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline flex items-center justify-end">
+                      <PlayCircle className="mr-2 h-5 w-5" />
+                      Play
+                    </a>
+                  ) : (
+                    <span className="text-muted-foreground">No Recording</span>
+                  )}
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockRecordings.map((rec) => {
-                const statusInfo = statusIconsAndText[rec.status] || { icon: AlertTriangle, text: 'Unknown', colorClass: 'text-gray-500 bg-gray-100 border-gray-300' };
-                const StatusIcon = statusInfo.icon;
-                return (
-                  <TableRow key={rec.id} className="hover:bg-secondary/50 transition-colors">
-                    <TableCell className="font-medium">{rec.callerId}</TableCell>
-                    <TableCell>{format(parseISO(rec.startTime), 'MMM d, yyyy HH:mm')}</TableCell>
-                    <TableCell>{rec.duration}</TableCell>
-                    <TableCell>{rec.agent?.name || 'N/A'}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline" className={`whitespace-nowrap ${statusInfo.colorClass}`}>
-                        <StatusIcon className="mr-1.5 h-3.5 w-3.5" />
-                        {statusInfo.text}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right space-x-1">
-                      {rec.recordingUrl && (
-                         <Tooltip>
-                           <TooltipTrigger asChild>
-                             <Button variant="ghost" size="icon" aria-label="Play Recording">
-                               <PlayCircle className="h-6 w-6 text-primary" /> {/* Increased icon size */}
-                             </Button>
-                           </TooltipTrigger>
-                           <TooltipContent>
-                             <p>Play Recording</p>
-                           </TooltipContent>
-                         </Tooltip>
-                      )}
-                      {rec.transcriptSummary && (
-                        <Tooltip>
-                          <TooltipTrigger asChild>
-                            <Button variant="ghost" size="icon" aria-label="View Transcript Summary">
-                              <FileText className="h-6 w-6 text-muted-foreground" /> {/* Increased icon size */}
-                            </Button>
-                          </TooltipTrigger>
-                          <TooltipContent>
-                            <p>View Transcript Summary</p>
-                          </TooltipContent>
-                        </Tooltip>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                );
-              })}
-            </TableBody>
-          </Table>
-        </TooltipProvider>
+            ))}
+          </TableBody>
+        </Table>
+        )}
       </CardContent>
     </Card>
   );
