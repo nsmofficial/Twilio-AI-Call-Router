@@ -1,164 +1,174 @@
+# Next.js AI Call Center
 
-# NextJS AI Call Center Dashboard
+## Project Summary
 
-## Project Overview
+This project showcases the development of a sophisticated, AI-powered Interactive Voice Response (IVR) system for a call center, built from the ground up using a modern web technology stack. The core of the application is a Next.js-based dashboard that provides a real-time view of agent availability and a comprehensive history of all processed calls. The system leverages Twilio for telephony, allowing it to handle live phone calls, and integrates with Google's Gemini models via Genkit to create an intelligent, multi-turn conversational AI.
 
-This project is a dashboard I whipped up to simulate an AI-powered call center IVR. The main idea was for me to test how an AI would handle the initial part of a call – you know, grabbing the caller's name and age, and then figuring out if that info is good enough to pass them to a human.
+The primary goal of the AI is to interact with callers to gather essential preliminary information, such as their name and age. It is designed with robust logic to handle partial information, asking clarifying follow-up questions to complete its data collection before making a decision. Once the necessary information is gathered, the system intelligently determines if an agent is available and, if so, seamlessly transfers the call.
 
-I used Next.js for the frontend, mostly because it's quick to get stuff up and running, and server components are pretty neat for this kind of dashboard. For the UI, it's all ShadCN components with Tailwind CSS, so it looks decent without a ton of custom styling work on my part.
+Persistence is achieved through a Vercel Postgres database, managed by Prisma, which stores all agent data and call logs. This ensures that the state is maintained across server restarts and provides a rich dataset for the dashboard's call history feature.
 
-The AI smarts? That's Genkit. I've got a couple of flows set up: one to pull out info like name and age from whatever text you type in (simulating a call transcript), and another to double-check if that info makes sense. Think of it like a quick sanity check before a real agent gets bothered. This part can be tested through the "AI Call Simulation" card on the dashboard.
+A key aspect of the development process was the creation of a comprehensive, end-to-end testing suite. A dedicated script (`test:multi-turn`) was developed to simulate a full call lifecycle, from the initial connection to the final agent status cleanup. This script interacts with the same database and API endpoints as a real call, ensuring high confidence in the application's logic. The development environment is further enhanced by an automated `ngrok` tunneling script (`dev-with-tunnel.js`), which simplifies the process of exposing the local server to Twilio's webhooks, making real-world testing efficient and straightforward. This project serves as a practical, in-depth example of integrating modern AI, database, and telephony services into a cohesive, real-world application.
 
-You can punch in some sample call transcripts on the dashboard, hit a button, and see what the AI comes up with. It's all mock data for the agent statuses and call logs right now.
+---
 
-The project also includes integration with Twilio to handle live calls. When a user calls the configured Twilio number:
-1.  The call is answered by `/api/twilio/voice`.
-2.  The AI (via TwiML `<Gather>`) asks the caller for their name and age.
-3.  The spoken response is sent to `/api/twilio/handle-ivr-response`.
-4.  This endpoint uses the `collectCallerInformation` Genkit flow to extract details.
-5.  If successful, it uses the `verifyCallerResponses` Genkit flow to validate.
-6.  A TwiML response is then given to the caller based on the AI's findings, simulating a transfer if verification is successful.
+This project is an AI-powered call center IVR (Interactive Voice Response) and dashboard, built with Next.js, Genkit, Twilio, and Vercel Postgres. It demonstrates a multi-turn conversational AI that can gather information from a caller, process it, and intelligently route the call to a human agent.
 
-It helped me quickly see if the prompts I'm giving the AI are actually working or if they need tweaking. Pretty handy for iterating on the AI logic.
+The dashboard provides a real-time view of agent status and a history of all calls processed by the system.
+
+![Dashboard Screenshot](UI/ui%20screenshot.png)
+
+## Core Features
+
+*   **Conversational AI IVR:** A multi-turn AI that intelligently gathers caller information (name, age).
+*   **Dynamic Call Routing:** The AI determines when it has enough information to transfer the caller to an available agent.
+*   **Real-time Agent Dashboard:** A frontend built with Next.js and ShadCN UI to monitor agent status (`Available`, `Busy`, etc.) and view call history.
+*   **Persistent Data:** Call logs and agent data are stored in a Vercel Postgres database, managed with Prisma.
+*   **End-to-End Testing:** A robust local testing script (`npm run test:multi-turn`) simulates a full call flow, including database setup and cleanup, to ensure reliability.
+*   **Automated Tunneling:** The development server automatically uses `ngrok` to create a public URL, making it easy to connect with Twilio webhooks.
 
 ## Tech Stack & Key Tools
 
-*   **Framework:** Next.js (v15.3.x app router)
+*   **Framework:** Next.js (App Router)
 *   **Language:** TypeScript
-*   **AI Integration:** Genkit (v1.8.x) with Google AI (Gemini models)
+*   **AI Integration:** Google AI (Gemini) via Genkit
+*   **Database:** Vercel Postgres with Prisma
 *   **Telephony:** Twilio
-*   **UI:** React, ShadCN UI
-*   **Styling:** Tailwind CSS (with CSS Variables for theming)
-*   **Form Handling:** React Hook Form with Zod for validation
-*   **Icons:** Lucide React
+*   **UI:** React, ShadCN UI, Recharts for charts
+*   **Styling:** Tailwind CSS
+*   **Runtime Environment:** `tsx` for running TypeScript scripts
+*   **Tunneling:** `ngrok`
 
 ## Prerequisites
 
-*   **Node.js:** v20.x or later recommended
-*   **npm:** v10.x or later (or yarn v1.22.x or later)
-*   **Google AI API Key (Required for AI Features):**
-    *   You'll need an API key from Google AI Studio (or Google Cloud Console) to use the Gemini models via Genkit.
-    *   If you don't provide an API key, AI features (both simulation and live call processing) will be disabled.
-*   **Twilio Account (Required for Twilio Integration):**
-    *   A Twilio account.
-    *   Your Twilio Account SID and Auth Token.
+*   **Node.js:** v20.x or later
+*   **npm:** v10.x or later
+*   **Twilio Account:**
+    *   Your Account SID and Auth Token.
     *   A Twilio phone number.
-*   **ngrok (For Local Twilio Development, if not using a cloud IDE with a public URL):**
-    *   A tool to expose your local server to the internet, so Twilio can send requests to your webhooks. Download from [ngrok.com](https://ngrok.com/).
+*   **Google AI API Key:**
+    *   An API key from Google AI Studio to use the Gemini models.
+*   **Vercel Account:**
+    *   A Vercel account to create a free Postgres database.
+*   **ngrok Account:**
+    *   An `ngrok` authtoken for creating a stable public URL for local development.
 
-## Setup & Running
+## Setup & Running Instructions
 
-1.  **Clone the repository:**
-    ```bash
-    git clone <your-repo-url>
-    cd <project-directory-name>
-    ```
+Follow these steps to get the project running locally.
 
-2.  **Install dependencies:**
-    Using npm:
-    ```bash
-    npm install
-    ```
-    Or using yarn:
-    ```bash
-    yarn install
-    ```
+### 1. Clone the Repository
 
-3.  **Set up Environment Variables:**
-    Create a `.env` file in the root of the project by copying the example file:
-    ```bash
-    cp .env.example .env
-    ```
-    Open the `.env` file and add your keys:
-    ```env
-    # For Genkit AI features
-    GOOGLE_API_KEY=YOUR_GOOGLE_AI_API_KEY_HERE
+```bash
+git clone https://github.com/your-username/your-repo-name.git
+cd your-repo-name
+```
 
-    # For Twilio Integration
-    TWILIO_ACCOUNT_SID=YOUR_TWILIO_ACCOUNT_SID_HERE
-    TWILIO_AUTH_TOKEN=YOUR_TWILIO_AUTH_TOKEN_HERE
-    # TWILIO_PHONE_NUMBER=+1YOURTWILIONUMBER # Optional, but good to have
-    ```
-    *   `GOOGLE_API_KEY` is essential for all AI features. If left blank, AI simulation will be disabled, and live Twilio calls requiring AI will fail or respond with an error. The dashboard UI will still load.
-    *   `TWILIO_ACCOUNT_SID` and `TWILIO_AUTH_TOKEN` are required for Twilio integration.
+### 2. Install Dependencies
 
-4.  **Run the Next.js Development Server:**
-    ```bash
-    npm run dev
-    ```
-    The application will typically be available at `http://localhost:9002` (or the port specified in your `package.json` `dev` script or Next.js default `3000`).
-    If you are using a cloud-based IDE (like Firebase Studio, Gitpod, GitHub Codespaces, etc.), it will provide you with a public URL for your running application.
+```bash
+npm install
+```
 
-5.  **Set up Twilio Webhook (for Twilio integration):**
-    Twilio needs to send HTTP requests to your application's `/api/twilio/voice` endpoint. This endpoint must be accessible from the public internet.
+### 3. Set Up Environment Variables
 
-    *   **If using a Cloud-Based IDE (e.g., Firebase Studio, Gitpod, GitHub Codespaces):**
-        1.  Ensure your Next.js app is running.
-        2.  Your cloud IDE will provide a public URL for your running application (e.g., `https://your-unique-id.cloud-provider.dev` or `https://port-9002-your-instance.cloud-provider.app`). For instance, a Firebase Studio URL might look like `https://9000-your-project-details.cluster-id.cloudworkstations.dev`.
-        3.  Your Twilio voice webhook URL will be this public URL plus `/api/twilio/voice` (e.g., `https://your-public-url.com/api/twilio/voice`). The `handle-ivr-response` endpoint is called by Twilio based on the `action` in the TwiML from the `voice` endpoint.
+Create a file named `.env.local` in the project root. Copy and paste the following content into it, then fill in the values for each variable.
 
-    *   **If running locally (not in a cloud IDE with a public URL):**
-        1.  Ensure your Next.js app is running (e.g., on port `9002`).
-        2.  Open a new terminal and run `ngrok` to expose your local port:
-            ```bash
-            ngrok http 9002
-            ```
-            (Replace `9002` with your application's port if it's different).
-        3.  Ngrok will give you a public HTTPS URL (e.g., `https://your-unique-id.ngrok.io`).
-        4.  Your Twilio voice webhook URL will be this ngrok URL plus `/api/twilio/voice` (e.g., `https://your-unique-id.ngrok.io/api/twilio/voice`).
+```env
+# .env.local
 
-    *   **Twilio Configuration Steps:**
-        1.  Go to your [Twilio Console](https://www.twilio.com/console).
-        2.  Navigate to "Phone Numbers" > "Manage" > "Active Numbers" (or find your number through the search).
-        3.  Click on the Twilio phone number you want to use.
-        4.  Scroll down to the "Voice & Fax" (or "Voice") section.
-        5.  Under "A CALL COMES IN" (or "CONFIGURE WITH", "PRIMARY HANDLER"), select "Webhook".
-        6.  In the text field, paste your full public webhook URL for the initial call (e.g., `https://your-public-url.com/api/twilio/voice`).
-        7.  Ensure the HTTP method is set to `HTTP POST`.
-        8.  Save the configuration.
-        9.  Call your Twilio number to test. You should be greeted by the AI and asked for your name and age.
+# Genkit AI Features - Get from Google AI Studio or Google Cloud Console
+GOOGLE_API_KEY=YOUR_GOOGLE_AI_API_KEY_HERE
 
-6.  **Run the Genkit Development Server (Optional, for AI flow inspection, requires API Key):**
-    If you want to inspect, test, or debug the Genkit flows directly using the Genkit Inspector UI (and you have set up your `GOOGLE_API_KEY`), run this command in a *separate terminal*:
-    ```bash
-    npm run genkit:dev
-    ```
-    The Genkit Inspector will usually be available at `http://localhost:4000`.
+# Vercel Postgres Database - Get from your Vercel project dashboard
+DATABASE_URL="postgresql://..."
 
-## Building for Production
+# Twilio Telephony - Get from your Twilio Console
+TWILIO_ACCOUNT_SID=YOUR_TWILIO_ACCOUNT_SID_HERE
+TWILIO_AUTH_TOKEN=YOUR_TWILIO_AUTH_TOKEN_HERE
 
-1.  **Build the Next.js application:**
-    ```bash
-    npm run build
-    ```
+# Ngrok Tunneling - Get from your ngrok Dashboard
+# Required for the dev server to expose a public URL for Twilio webhooks
+NGROK_AUTHTOKEN=YOUR_NGROK_AUTHTOKEN_HERE
+```
 
-2.  **Start the production server:**
-    ```bash
-    npm run start
-    ```
-    For production, ensure your webhook configurations in Twilio point to your live application URL.
+### 4. Set Up the Database
+
+Run the following command to apply the database schema and create the necessary tables.
+
+```bash
+npm run db:migrate
+```
+
+Next, seed the database with initial data (e.g., sample agents).
+
+```bash
+npm run db:seed
+```
+
+### 5. Run the Development Server
+
+Start the application with a single command. This will launch the Next.js development server and automatically create a public `ngrok` URL for you.
+
+```bash
+npm run dev
+```
+
+Look for the `ngrok` URL in the console output. It will look like this:
+**`Public URL: https://<some-random-string>.ngrok-free.app`**
+
+This is the URL you will use for the Twilio webhook. All server activity, including the `ngrok` URL and incoming call data, is logged to `logs/app.log`.
+
+### 6. Configure the Twilio Webhook
+
+1.  Go to your **Twilio Console**.
+2.  Navigate to **Phone Numbers > Manage > Active numbers** and click on your number.
+3.  Scroll down to the **Voice & Fax** section.
+4.  Under **"A CALL COMES IN"**, set the webhook to your public `ngrok` URL, followed by the API path:
+    *   `https://<your-ngrok-url>.ngrok-free.app/api/twilio/incoming-call`
+5.  Set the HTTP method to **`HTTP POST`**.
+6.  Click **Save**.
+
+### 7. Make a Call
+
+You are now set up! Call your Twilio number from any phone. The AI should answer and guide you through the process.
+
+## Testing
+
+This project includes an end-to-end test script that simulates a full multi-turn conversation. It resets the database state before running and simulates the final webhook from Twilio to clean up the agent status.
+
+To run the test, use the following command:
+
+```bash
+npm run test:multi-turn
+```
+
+A detailed log of the test run will be created in the `logs/` directory.
 
 ## Project Structure Highlights
 
-*   `src/app/`: Main Next.js application directory using the App Router.
+*   `dev-with-tunnel.js`: A smart startup script that runs the Next.js server and `ngrok` tunnel simultaneously.
+*   `src/app/`: Main Next.js application directory.
     *   `page.tsx`: The main dashboard page.
-    *   `layout.tsx`: The root layout for the application.
-    *   `globals.css`: Global styles and Tailwind CSS theme variables.
-    *   `api/twilio/voice/route.ts`: API route for handling initial incoming Twilio voice calls and gathering input.
-    *   `api/twilio/handle-ivr-response/route.ts`: API route for processing the speech input gathered by the `voice` route, interacting with AI flows, and responding to the caller.
-*   `src/components/`: Reusable React components.
-    *   `dashboard/`: Components specific to the dashboard UI.
-    *   `ui/`: ShadCN UI components.
-*   `src/ai/`: Contains all Genkit-related code.
-    *   `flows/`: Genkit flows for AI tasks.
-    *   `genkit.ts`: Genkit initialization and configuration.
-    *   `dev.ts`: Entry point for the Genkit development server.
-*   `src/lib/`:
-    *   `actions.ts`: Next.js Server Actions, used by the AI simulation card.
-    *   `utils.ts`: Utility functions.
-*   `src/types/`: TypeScript type definitions.
-*   `public/`: Static assets.
-*   `.env.example`: Example environment file for API keys and other secrets.
-*   `tailwind.config.ts`, `next.config.ts`, `package.json`, `tsconfig.json`: Project configuration files.
+    *   `api/twilio/`: Contains all Twilio webhook handlers.
+        *   `incoming-call/route.ts`: Handles the initial call from Twilio.
+        *   `gather/route.ts`: Processes the user's speech and runs the AI logic.
+        *   `dial-status/route.ts`: A callback from Twilio to clean up agent status after a call ends.
+*   `src/components/`: Reusable React components, including dashboard-specific components and ShadCN UI elements.
+*   `src/ai/`: All Genkit-related code, including AI flows.
+*   `src/lib/`: Core application logic, including server actions (`actions.ts`) and the application logger (`logger.ts`).
+*   `src/services/`: Services for interacting with the database (e.g., `agentService`, `callService`).
+*   `prisma/`: Contains the database schema (`schema.prisma`), migrations, and seed script.
+*   `scripts/`: Contains test scripts like `test-multi-turn.js`.
+*   `logs/`: Contains detailed log files for the main application (`app.log`) and test runs.
+
+## Key API Endpoints
+
+*   `POST /api/twilio/incoming-call`: The initial webhook Twilio calls. It initiates the AI conversation.
+*   `POST /api/twilio/gather`: Processes speech results from the user and orchestrates the multi-turn AI conversation.
+*   `POST /api/twilio/dial-status`: A status callback from Twilio after a dialed call completes. Used to free up the agent.
+*   `GET /api/agents`: Fetches all agents for the dashboard.
+*   `PUT /api/agents`: Allows manual updates to an agent's status from the dashboard.
+*   `GET /api/calls`: Fetches all call history for the dashboard.
 
     
